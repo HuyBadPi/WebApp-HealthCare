@@ -138,6 +138,7 @@ nhưng nếu ta muốn bấm vào button và nhảy qua page khác thì ta sẽ 
 
 //----------------------------------------------------------------
 hàm req.body : cho phép ta lấy tất cả input trong file ejs , nơi mà ta đặt thuộc tính là name="..." 
+hàm req.query.id : trên url chúng ta sẽ dùng là ?id=.., thì khi ta dùng ?, express sẽ hiểu rằng id là keyword ta tìm kiếm
 
 let user = await db.User.findOne({
                 where: {id: data.id,},
@@ -147,3 +148,8 @@ where này chính là điều kiện để tìm user trong table User
 user.firstName = data.firstname; 
 firstName : là firstName trong file user.js trong thư mục models
 firstname : là name="firstname" trong file view .ejs
+
+//----------------------------------------------------------------
+mặc định khi nhấn vào link trong thẻ <a href> thì nó sẽ phải render ra dữ liệu => nó chính là method get
+nên khi dùng thẻ <a href> thì ta phải lưu ý nó là method get
+
