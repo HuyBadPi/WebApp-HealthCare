@@ -1,0 +1,149 @@
+######################################################################################################################
+#                                                                                                                    #
+#    file này dùng để giải thích những gì đã học, không cần phải public file này, xem như file này không tồn tại.    #
+#                                                                                                                    #
+######################################################################################################################
+
+1. giả sử ban đầu chưa có gì, chỉ có thư mục node_js. 
+đầu tiên mở thư mục node_js bằng vscode, sau đó mở terminal và gõ lệnh : npm init
+tất cả đều có thể bỏ trống hoặc điền
+sau khi hoàn thành, ta sẽ nhân nhận được file package.json 
+
+2. cài đặt package
+gõ lệnh : npm install body-parser@1.19.0 dotenv@8.2.0 ejs@3.1.5 express@4.17.1
+chúng ta có thể bỏ phần @... để cài phiên bản mới nhất của package
+
+body-parser : dùng để viết API - tức là trên phía server nodejs nó giúp chúng ta lấy được các tham số từ client gửi lên server
+dotenv      : giúp chúng ta lấy được các tham số chúng ta khai báo trong file .env
+ejs         : chính là view engine, tức là khi chúng ta muốn chạy 1 cái màn hình trên phía server thì cần phải có 1 view engine 
+express     : là framework, giúp chúng ta chạy được project này 
+
+gõ lệnh : npm install --save-dev @babel/core@7.12.10 @babel/node@7.12.10 @babel/preset-env@7.12.10 nodemon@2.0.7
+chúng ta có thể bỏ phần @... để cài phiên bản mới nhất của package
+
+3 package đầu tiên : đây là compiler của nodejs 
+nodemon            : khi có sử thay đổi trong file thì server sẽ tự động restart, đỡ phải run đi run lại
+
+3. tạo thêm thư mục src 
+trong thư mục src, tạo file server.js, tạo các thư mục : config, controllers, public, route, view, services
+
+server.js   : dùng để chạy server của chúng ta
+config      : nơi cấu hình các tham số 
+controllers : 
+public      : nơi lưu trữ các file có thể public ra ngoài như image, css
+route       : khi vào đường link của 1 website, phải có 1 nơi để khai báo tất cả các đường link cho server thì server mới biết cái route có tồn tại trên server hay không  
+view        : dùng để render. các file html nằm trong này
+services    : nơi chọc đến database 
+
+đây là mô hình mvc, model sẽ viết sau 
+
+4. tạo thêm file .env, .env.example, .gitignore, .babelrc 
+
+.env            : chúng ta cấu hình các tham số môi trường trong file này
+.env.example    : đây là file ta sẽ đẩy lên github. file này và file .env không khác nhau, chỉ là chúng ta không ghi giá trị vào vì trong file .env ta sẽ cấu hình username, password chẳng hạng thì ta không thể đẩy nó lên github được
+.gitignore      : quy định những những file không cần phải public
+.babelrc        : cấu hình cho compiler
+
+
+// viết theo rest api
+nếu ta muốn lấy thông tin, sử dụng      : get
+nếu ta muốn tạo thông tin, sử dụng      : post
+nếu ta muốn xóa thông tin, sử dụng      : delete
+nếu ta muốn update thông tin, sử dụng   : put
+
+mỗi khi user vào 1 đường link, thì ngay lập tức express sẽ tìm kiếm đường link đó trong file web.js 
+tại sao lại tìm kiếm ở web.js ?
+tại vì trong file server.js, chúng ta đã nhúng tất cả các đường link chúng ta đã khai báo cho express biết.
+nếu viết theo kiểu như này 
+        router.get("/hoidanit", (req, res) => {
+                return res.send("Hoc web cung hoidanit");
+            });
+thì nó không tuân theo mô hình mvc (model view controller)
+view chính là nơi hiện ra dòng chữ này 
+
+//-------------------------------------
+trong thư mục views, chúng ta không ghi file là homepage.html ?
+đó là vì trong thư mục config, chúng ta đã sử dụng view engine là ejs nên chúng ta dùng hậu tố .ejs chứ không phải là .html
+ta vẫn code html như thường trong file homepage.ejs 
+
+trong file homepage.ejs, chúng ta có dòng 
+        return res.render('homepage.ejs');
+tại sao chúng ta không ghi rõ địa chỉ file mà chỉ có mỗi tên file ?
+đó là vì trong file viewEngine.js, chúng ta đã có dòng 
+        app.set("views", "./src/views");
+dòng này chỉ ra các file "views" nằm ở trong /src/view nên express sẽ tự tìm đến /src/view 
+
+
+//----------------------------------------------
+để dùng được từ khóa await, bắt buộc chúng ta phải dùng từ khóa async trước (). khi mà dùng await và async, lúc này là ta đã nói với JS rằng 
+đây là 1 hàm bất đồng bộ, tức là chúng ta cần thời gian để nó trả về kết quả.
+
+kết nối các hàm đến DB để lấy dữ liệu từ DB và render nó ra màn hình
+
+thêm dòng  "logging": false vào file config.json và logging: false vào file connectDB.js để mỗi lần request không phải in ra câu : 
+Executing (default): SELECT `id`, `firstName`, `lastName`, `email`, `createdAt`, `updatedAt` FROM `Users` AS `User`;
+
+<%=variable%> dùng để in ra giá trị của biến trong viewJS 
+
+data: JSON.stringify(data) : tức là convert data từ dạng json object sang kiểu string
+
+//----------------------------------------------------------------
+id trong file user.js khi được set thành string, thì ta phải sửa tương ứng bên file create-user.js là type: Sequelize.STRING trong mục id
+tại user.init trong user.js, ta không cần khai báo id vì trong create-user.js thì id nó là primarykey
+
+//---------------------------------------------------------------
+chúng ta sẽ không tạo table trực tiếp trong phpmyadmin mà ta sẽ tạo bằng file create-user.js và sau đó chạy lệnh : npx sequelize-cli db:migrate
+phải chạy nó trong thư mục src
+
+//---------------------------------------------------------------
+sau khi tạo xong các file trong thư nục models, migrations và seeder, ta dùng lệnh : npx sequelize-cli db:seed:all
+
+//---------------------------------------------------------------
+table sequelizemeta dùng để kiểm soát các table khác. khi ta chạy lệnh "npx sequelize-cli db:migrate" nó sẽ cập nhật các table.
+nếu ta sửa các thuộc tính của table như sửa datatype của các column thì ta phải vào table sequelizemeta xóa table đó và chạy lại lệnh "npx sequelize-cli db:migrate"
+để nó sinh ra lại table đó. nếu không có sự thay đổi số lượng table trong table sequelizemeta thì khi gõ lệnh "npx sequelize-cli db:migrate" thì sẽ ra lỗi :
+"No migrations were executed, database schema was already up to date."
+nên đó là lí do tại sao để cập nhật 1 table, ta phải xóa nó trong table sequelizemeta rồi dùng lệnh "npx sequelize-cli db:seed:all" để tạo mới lại nó
+
+//------------------------------------------------------------------------
+sau khi viết dữ liệu trong file seeder, ta dùng lệnh : npx sequelize-cli db:seed:all
+để thêm dữ liệu vào table
+
+//------------------------------------------------------------------------
+đối với nodeJS, phía server muốn lấy input của người dùng thì nó cần thuộc tính "name" chứ không cần thuộc tính "id"
+
+type="email" => khi submit thì phải có dấu @
+type="password" => khi nhập vào thì sẽ hiện ra dấu chấm
+type="text" => nhập gì ra nấy 
+
+//------------------------------------------------------------------------
+kbg bỏ password dạng plaintext vào db mà phải để hash password
+ta sử dụng package npm bcrypt : npm i bcrypt
+
+//------------------------------------------------------------------------
+file CRUDservice có nhiệm vụ nhận data từ phía controller và thao tác nó về db 
+để tạo user trong db, cần phải import db vào : import db from "../models/index";
+để map đc đến cái table user, ta cần phải biết model ấy tên là gì
+
+//------------------------------------------------------------------------
+lệnh resolve cũng tương tự như return, nhưng vì ta dùng try - catch nên phải dùng resolve
+trong <form> có cái action="/path" thì khi mà ta nhấn button hay làm gì đấy thì nó sẽ dẫn tới đường dẫn /path 
+
+//------------------------------------------------------------------------
+bình thường để dùng 1 button ta sẽ dùng như này : <button class="btn-edit" type="button">Edit</button>
+nhưng nếu ta muốn bấm vào button và nhảy qua page khác thì ta sẽ dùng : <a href="/edit-crud?id=<%= dataTable[i].id %>" class="btn-edit" type="button">Edit</a>
+
+[] : mảng rỗng
+{} : object rỗng
+
+//----------------------------------------------------------------
+hàm req.body : cho phép ta lấy tất cả input trong file ejs , nơi mà ta đặt thuộc tính là name="..." 
+
+let user = await db.User.findOne({
+                where: {id: data.id,},
+});
+where này chính là điều kiện để tìm user trong table User
+
+user.firstName = data.firstname; 
+firstName : là firstName trong file user.js trong thư mục models
+firstname : là name="firstname" trong file view .ejs
